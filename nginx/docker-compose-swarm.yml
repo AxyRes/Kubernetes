@@ -1,0 +1,75 @@
+version: '3.0'
+
+services:
+
+  httpd:
+    hostname: apache2-httpd
+    image: httpd:2.4.54-bullseye
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - httpd_conf:/usr/local/apache2
+    deploy:
+      replicas: 2
+
+
+  mssql-server:
+    hostname: mssql
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - 1433:1433
+    user: root
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=P@ssword123
+    volumes:
+      - mssql_data:/var/opt/mssql/data
+      - mssql_logs:/var/opt/mssql/log
+      - mssql_secrets:/var/opt/mssql/secrets
+    deploy:
+      replicas: 1
+
+  
+  jenkins:
+    hostname: jenkins
+    image: jenkins/jenkins:2.375-jdk11
+    ports:
+      - "18080:8080"
+      - "18443:8443"
+    environment:
+      - JENKINS_OPTS="--prefix=/jenkins"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    deploy:
+      replicas: 1
+
+  
+  nexus:
+    hostname: nexus3
+    image: sonatype/nexus3:3.42.0
+    ports:
+      - "18081:8081"
+    volumes:
+      - nexus_conf:/opt/sonatype/nexus
+      - nexus_sona:/opt/sonatype/sonatype-work
+    deploy:
+      replicas: 2
+
+
+volumes:
+  httpd_conf:
+    external: true
+  mssql_data:
+    external: true
+  mssql_logs:
+    external: true
+  mssql_secrets:
+    external: true
+  jenkins_home:
+    external: true
+  nexus_conf:
+    external: true
+  nexus_sona:
+    external: true
+  

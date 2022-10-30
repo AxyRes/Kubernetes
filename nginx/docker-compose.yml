@@ -1,0 +1,42 @@
+version: '2.0'
+
+services:
+  
+  ngnix:
+    hostname: ngnix
+    image: nginx:1.23.2
+    container_name: nginx-1-23-2
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - nginx_conf:/etc/nginx
+  
+  mssql-server:
+    hostname: mssql
+    build: 
+      context: ./Dockerfile-MSSQL
+      dockerfile: Dockerfile
+    image: mssql-server:2019
+    container_name: mssql-server-2019
+    user: root
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=P@ssword123
+    volumes:
+      - mssql_data:/var/opt/mssql/data
+      - mssql_logs:/var/opt/mssql/log
+      - mssql_secrets:/var/opt/mssql/secrets
+    restart: always
+
+volumes:
+  nginx_conf:
+    external: true
+  mssql_data:
+    external: true
+  mssql_logs:
+    external: true
+  mssql_secrets:
+    external: true
